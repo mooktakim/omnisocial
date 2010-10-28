@@ -4,6 +4,10 @@ module Omnisocial
       self.remote_account_id  = auth_hash['uid']
       self.login              = auth_hash['user_info']['nickname']
       self.name               = auth_hash['user_info']['name']
+      self.user_hash          = auth_hash['extra']['user_hash']
+      if auth_hash['credentials'].present? and auth_hash['credentials']['token'].present?
+        self.token = auth_hash['credentials']['token']
+      end
     end
   
     def account_url
@@ -12,9 +16,9 @@ module Omnisocial
   
     def picture_url
       if self.login.include?('profile.php')
-        "https://graph.facebook.com/#{self.login.gsub(/[^\d]/, '')}/picture?type=square"
+        "https://graph.facebook.com/#{self.login.gsub(/[^\d]/, '')}/picture"
       else
-        "https://graph.facebook.com/#{self.login}/picture?type=square"
+        "https://graph.facebook.com/#{self.login}/picture"
       end
     end
   end

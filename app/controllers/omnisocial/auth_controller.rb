@@ -11,16 +11,31 @@ module Omnisocial
     end
   
     def callback    
-      account = case request.env['rack.auth']['provider']
-        when 'twitter' then
-          Omnisocial::TwitterAccount.find_or_create_from_auth_hash(request.env['rack.auth'])
-        when 'facebook' then
-          Omnisocial::FacebookAccount.find_or_create_from_auth_hash(request.env['rack.auth'])
+      auth = request.env['omniauth.auth'] || request.env['rack.auth']
+      account = case auth['provider']
+                when 'twitter'
+                  Omnisocial::TwitterAccount.find_or_create_from_auth_hash auth
+                when 'facebook'
+                  Omnisocial::FacebookAccount.find_or_create_from_auth_hash auth
+                end
+
+      if self.current_user
+        account.user = self.current_user
+        account.save
+        flash[:message] = "You have added #{auth['provider']} account successfully."
+      else
+        self.current_user = account.find_or_create_user
+        flash[:message] = 'You have logged in successfully.'
       end
-    
-      self.current_user = account.find_or_create_user
-      
-      flash[:message] = 'You have logged in successfully.'
+
+      # Add email
+      if auth['extra'].present? and
+        auth['extra']['user_hash'].present? and
+        auth['extra']['user_hash']['email'].present?
+        account.user.add_email auth['extra']['user_hash']['email']
+        account.save
+      end
+
       redirect_back_or_default(root_path)
     end
   
