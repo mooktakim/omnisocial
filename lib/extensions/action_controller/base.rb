@@ -32,11 +32,11 @@ class ActionController::Base
   
   def current_user
     @current_user ||= if session[:user_id]
-      User.find(session[:user_id])
+      User.find(session[:user_id]) rescue nil
     elsif cookies[:remember_token]
-      User.find_by_remember_token(cookies[:remember_token])
+      User.find_by_remember_token(cookies[:remember_token]) rescue nil
     else
-      false
+      nil
     end
   end
   
