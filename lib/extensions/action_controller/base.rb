@@ -16,12 +16,19 @@ class ActionController::Base
   
   # Utils
   
-  def store_location
-    session[:return_to] = request.fullpath
+  def store_location(url)
+    path = URI.parse(url).path.downcase
+    if !request.get? or ['/login', '/logout'].include?(path) or path.match(/^\/auth\//i)
+      session[:return_to] = nil
+    else
+      session[:return_to] = url
+    end
+  rescue
+    session[:return_to] = nil
   end
   
   def deny_access
-    store_location
+    store_location(request.fullpath)
     redirect_to login_path
   end
   

@@ -7,6 +7,8 @@ module Omnisocial
       if current_user?
         flash[:notice] = 'You are already signed in. Please sign out if you want to sign in as a different user.'
         redirect_to(root_path)
+      else
+        store_location(request.referer)
       end
     end
   
@@ -36,7 +38,7 @@ module Omnisocial
         account.save
       end
 
-      redirect_back_or_default(session['return_to'] || root_path)
+      redirect_back_or_default(root_path)
     end
   
     def failure
