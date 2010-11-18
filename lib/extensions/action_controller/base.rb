@@ -48,7 +48,7 @@ class ActionController::Base
     user.tap do |user|
       user.remember
       session[:user_id]         = user.id
-      cookies[:remember_token]  = user.remember_token
+      cookies.permanent.signed[:remember_token]  = user.remember_token
     end
   end
   
