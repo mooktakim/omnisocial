@@ -36,7 +36,7 @@ module Omnisocial
         account.save
       end
 
-      redirect_back_or_default(root_path)
+      redirect_back_or_default(session['return_to'] || root_path)
     end
   
     def failure
