@@ -44,6 +44,10 @@ module Omnisocial
     def twitter_login
       @twitter_login ||= login_accounts.detect{|l| l.kind_of? Omnisocial::TwitterAccount }
     end
+    
+    def twitter_logins
+      @twitter_logins ||= login_accounts.select{|l| l.kind_of? Omnisocial::TwitterAccount }
+    end
 
     def has_facebook?
       !!facebook_login
@@ -51,6 +55,10 @@ module Omnisocial
 
     def facebook_login
       @facebook_login ||= login_accounts.detect{|l| l.kind_of? Omnisocial::FacebookAccount }
+    end
+    
+    def facebook_logins
+      @facebook_logins ||= login_accounts.select{|l| l.kind_of? Omnisocial::FacebookAccount }
     end
   
     def to_param
