@@ -9,6 +9,9 @@ module Omnisocial
       if auth_hash['credentials'].present? and auth_hash['credentials']['token'].present?
         self.token = auth_hash['credentials']['token']
       end
+      if auth_hash['credentials'].present? and auth_hash['credentials']['secret'].present?
+        self.secret = auth_hash['credentials']['secret']
+      end
     end
   
     def account_url
