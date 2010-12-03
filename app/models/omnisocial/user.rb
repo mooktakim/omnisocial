@@ -6,6 +6,10 @@ module Omnisocial
 
     has_many :email_addresses, :dependent => :destroy
     accepts_nested_attributes_for :email_addresses
+    
+    before_save do
+      self.remember_token = SecureRandom.base64 if self.remember_token.blank?
+    end
 
     def add_email(email)
       self.email_addresses.create(:email => email) unless self.email_addresses.exists?(:email => email.downcase)
@@ -68,13 +72,21 @@ module Omnisocial
         self.id.to_s
       end
     end
+    
+    def self.find_with_remember_token(tok)
+      return nil if tok.blank?
+      toks = tok.split("|")
+      toks.shift
+      return nil if (tok = toks.join("|")).blank?
+      where(:remember_token => tok).first
+    end
   
     def remember
-      update_attributes(:remember_token => ::BCrypt::Password.create("#{Time.now}-#{self.login_account.type}-#{self.login}")) unless new_record?
+      "#{Time.now.to_i}|#{remember_token}"
     end
   
     def forget
-      update_attributes(:remember_token => nil) unless new_record?
+      update_attributes(:remember_token => SecureRandom.base64) unless new_record?
     end
   end
 end

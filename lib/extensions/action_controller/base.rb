@@ -48,11 +48,7 @@ class ActionController::Base
   end
   
   def cookie_login
-    return nil if cookies.signed[:remember_token].blank?
-    user = User.where(:remember_token => cookies.signed[:remember_token]).first
-    current_user = user if user
-  rescue
-    nil
+    User.find_with_remember_token(cookies.signed[:remember_token])
   end
   
   def current_user?
@@ -61,9 +57,8 @@ class ActionController::Base
   
   def current_user=(user)
     user.tap do |user|
-      user.remember
       session[:user_id] = user.id
-      cookies.permanent.signed[:remember_token]  = user.remember_token
+      cookies.permanent.signed[:remember_token] = user.remember
     end
   end
   
