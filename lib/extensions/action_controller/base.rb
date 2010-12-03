@@ -38,7 +38,7 @@ class ActionController::Base
   end
   
   def current_user
-    @current_user ||= session_login || cookie_login
+    @current_user ||= (session_login || cookie_login)
   rescue
     logout!
   end
@@ -50,8 +50,9 @@ class ActionController::Base
   def cookie_login
     return nil if cookies.signed[:remember_token].blank?
     user = User.where(:remember_token => cookies.signed[:remember_token]).first
-    session[:user_id] = user.id if user
-    user
+    current_user = user if user
+  rescue
+    nil
   end
   
   def current_user?
@@ -67,7 +68,6 @@ class ActionController::Base
   end
   
   def logout!
-    @current_user.try(:forget)
     @current_user = nil
     session.delete(:user_id)
     session.delete(:return_to)
