@@ -38,13 +38,20 @@ class ActionController::Base
   end
   
   def current_user
-    @current_user ||= if session[:user_id]
-      User.find(session[:user_id])
-    elsif cookies[:remember_token]
-      User.find_by_remember_token(cookies.signed[:remember_token])
-    end
+    @current_user ||= session_login || cookie_login
   rescue
     logout!
+  end
+  
+  def session_login
+    User.find(session[:user_id]) rescue nil
+  end
+  
+  def cookie_login
+    return nil if cookies.signed[:remember_token].blank?
+    user = User.where(:remember_token => cookies.signed[:remember_token]).first
+    session[:user_id] = user.id if user
+    user
   end
   
   def current_user?
