@@ -41,7 +41,7 @@ class ActionController::Base
     @current_user ||= if session[:user_id]
       User.find(session[:user_id])
     elsif cookies[:remember_token]
-      User.find_by_remember_token(cookies[:remember_token])
+      User.find_by_remember_token(cookies.signed[:remember_token])
     end
   rescue
     logout!
@@ -54,16 +54,17 @@ class ActionController::Base
   def current_user=(user)
     user.tap do |user|
       user.remember
-      session[:user_id]         = user.id
+      session[:user_id] = user.id
       cookies.permanent.signed[:remember_token]  = user.remember_token
     end
   end
   
   def logout!
-    session[:user_id] = nil
-    @current_user     = nil
+    @current_user.try(:forget)
+    @current_user = nil
+    session.delete(:user_id)
+    session.delete(:return_to)
     cookies.delete(:remember_token)
-    session[:return_to] = nil
   end
   
 end
