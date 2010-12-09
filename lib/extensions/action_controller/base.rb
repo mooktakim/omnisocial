@@ -48,7 +48,9 @@ class ActionController::Base
   end
   
   def cookie_login
-    User.find_with_remember_token(cookies.signed[:remember_token])
+    u = User.find_with_remember_token(cookies.signed[:remember_token])
+    current_user = u if u
+    u
   end
   
   def current_user?
