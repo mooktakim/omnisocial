@@ -30,9 +30,11 @@ class CreateOmnisocialTables < ActiveRecord::Migration
     
     add_index :login_accounts, :user_id
     add_index :login_accounts, :type
+    add_index :login_accounts, [:type, :remote_account_id], :name => 'type_remote_acc_id'
   end
 
   def self.down
+    remove_index :login_accounts, :name => 'type_remote_acc_id'
     remove_index :login_accounts, :type
     remove_index :login_accounts, :user_id
     drop_table :login_accounts

@@ -2,6 +2,7 @@ module Omnisocial
   class LoginAccount < ActiveRecord::Base
     belongs_to :user, :class_name => '::User'
     serialize :user_hash
+    default_scope :include => :user
 
     before_save do
       self.login = self.remote_account_id if self.login.blank?
